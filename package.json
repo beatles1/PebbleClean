@@ -1,0 +1,64 @@
+{
+    "author": "Edward Bowden",
+    "dependencies": {},
+    "keywords": [],
+    "name": "test-watchface",
+    "pebble": {
+        "capabilities": [
+            "location",
+            "health"
+        ],
+        "displayName": "Test Watchface",
+        "enableMultiJS": false,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": [
+                {
+                    "file": "images/diamond_purple2.png",
+                    "name": "DIAMOND_BACKGROUND_PURPLE2",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/diamond_blue.png",
+                    "name": "DIAMOND_BACKGROUND_BLUE",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/diamond_purple.png",
+                    "name": "DIAMOND_BACKGROUND_PURPLE",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/diamond_green.png",
+                    "name": "DIAMOND_BACKGROUND_GREEN",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "images/poly.png",
+                    "name": "POLY_BACKGROUND",
+                    "type": "bitmap"
+                },
+                {
+                    "file": "fonts/Squares Bold Free.ttf",
+                    "name": "FONT_SQUARES_BOLD_40",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Squares Bold Free.ttf",
+                    "name": "FONT_SQUARES_BOLD_16",
+                    "type": "font"
+                }
+            ]
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "basalt"
+        ],
+        "uuid": "38be7515-1957-4e27-b151-1f04bb7dda54",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "0.1.0"
+}
