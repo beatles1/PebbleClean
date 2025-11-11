@@ -32,7 +32,7 @@
     }
   },
 
-  "workspaceFolder": "/workspaces/codespaces-pebble/PebbleClean",
+  "workspaceFolder": "/workspaces/PebbleClean/",
   "containerEnv": {
     "LOCALWORKSPACEFOLDERBASENAME": "${localWorkspaceFolderBasename}",
     "LOCALWORKSPACEFOLDER": "${localWorkspaceFolder}",
