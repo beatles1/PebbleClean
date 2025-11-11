@@ -53,7 +53,8 @@
         },
         "sdkVersion": "3",
         "targetPlatforms": [
-            "basalt"
+            "basalt",
+            "emery"
         ],
         "uuid": "38be7515-1957-4e27-b151-1f04bb7dda54",
         "watchapp": {
