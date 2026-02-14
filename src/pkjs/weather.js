@@ -11,7 +11,7 @@ function retrieve_weather() {
 	console.log("Updating Weather...");
 	var locationOptions = {
 		enableHighAccuracy: false, // Quick and battery efficient plox
-		maximumAge: 120000, // We'll accept any location from the last 2 minutes
+		maximumAge: 600000, // We'll accept any location from the last 10 minutes
 		timeout: 120000 // Return a result within 2 minutes max
 	};
 	
