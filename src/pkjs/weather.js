@@ -1,4 +1,4 @@
-var cacheTime = 0; //840000; // Time to cache temp in ms (14 mins)
+var cacheTime = 840000; // Time to cache temp in ms (14 mins)
 var owmapikey = "23789eef1c47852e89dc06b532451573";
 
 Pebble.addEventListener('ready',
