@@ -2,13 +2,13 @@
     "author": "Edward Bowden",
     "dependencies": {},
     "keywords": [],
-    "name": "test-watchface",
+    "name": "clean",
     "pebble": {
         "capabilities": [
             "location",
             "health"
         ],
-        "displayName": "Test Watchface",
+        "displayName": "Clean",
         "enableMultiJS": false,
         "messageKeys": [],
         "projectType": "native",
