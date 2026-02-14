@@ -16,6 +16,25 @@ static int battery_bar_width;
 static bool bluetooth_status;
 static char weather_text[64] = "...";
 static int last_weather_update = 0;
+static HealthMetric health_metric;
+static bool health_data_available;
+static HealthValue health_value;
+
+static void init_health() {
+	health_metric = HealthMetricStepCount; // todo: allow this to be set in settings
+	time_t start = time_start_of_today();
+	time_t end = time(NULL);
+
+	HealthServiceAccessibilityMask mask = health_service_metric_accessible(health_metric, start, end);
+	health_data_available = mask & HealthServiceAccessibilityMaskAvailable;
+}
+
+static void update_health() {
+	if (health_data_available) {
+		health_value = health_service_sum_today(health_metric);
+	}
+	APP_LOG(APP_LOG_LEVEL_INFO, "Health Value: %d", (int)health_value);
+}
 
 static void update_weather() {
 	text_layer_set_text(s_weather_layer, ".");
@@ -69,6 +88,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 		update_weather();
 		last_weather_update = mktime(tick_time);
 	}
+
+	update_health();
 }
 
 static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
@@ -162,6 +183,9 @@ static void main_window_load(Window *window) {
 	
 	// Grab bluetooth status before trying to draw it
 	bluetooth_status = bluetooth_connection_service_peek();
+
+	// Initialise health
+	init_health();
 	
 	// Create layer for Drawing
 	s_drawing_layer = layer_create(GRect(0, 0, 144, 168));
@@ -171,6 +195,7 @@ static void main_window_load(Window *window) {
 	// Make sure the time is displayed from the start
 	update_time();
 	update_weather();
+	update_health();
 }
 
 static void main_window_unload(Window *window) {
