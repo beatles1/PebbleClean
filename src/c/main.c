@@ -19,8 +19,12 @@ static int last_weather_update = 0;
 static HealthMetric health_metric;
 static bool health_data_available;
 static HealthValue health_value;
+static float health_bar_width;
+static int health_target;
 
 static void init_health() {
+	health_target = 10000; // todo: allow this to be set in settings
+
 	health_metric = HealthMetricStepCount; // todo: allow this to be set in settings
 	time_t start = time_start_of_today();
 	time_t end = time(NULL);
@@ -32,8 +36,11 @@ static void init_health() {
 static void update_health() {
 	if (health_data_available) {
 		health_value = health_service_sum_today(health_metric);
+		health_bar_width = ((float)health_value / (float)health_target);
+	} else {
+		health_bar_width = 1;
 	}
-	APP_LOG(APP_LOG_LEVEL_INFO, "Health Value: %d", (int)health_value);
+	//APP_LOG(APP_LOG_LEVEL_INFO, "Health Value: %d", (int)health_value);
 }
 
 static void update_weather() {
@@ -96,9 +103,9 @@ static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
 	// Draw battery bar
 	graphics_context_set_stroke_color(ctx, battery_bar_color);
 	graphics_context_set_fill_color(ctx, battery_bar_color);
-	graphics_fill_rect(ctx, GRect((144 / 2) - (battery_bar_width / 2), 91, battery_bar_width, 3), 0, GCornerNone);
+	graphics_fill_rect(ctx, GRect((144 / 2) - (battery_bar_width / 2), 165, battery_bar_width, 3), 0, GCornerNone);
 	
-	// Draw bluetooth status bar
+	// Draw health bar
 	if (bluetooth_status) {
 		graphics_context_set_stroke_color(ctx, GColorCadetBlue);
 		graphics_context_set_fill_color(ctx, GColorCadetBlue);
@@ -106,7 +113,7 @@ static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
 		graphics_context_set_stroke_color(ctx, GColorDarkCandyAppleRed);
 		graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
 	}
-	graphics_fill_rect(ctx, GRect(0, 165, 144, 3), 0, GCornerNone);
+	graphics_fill_rect(ctx, GRect(((144 / 2) - ((144 * health_bar_width) / 2)), 91, (144 * health_bar_width), 3), 0, GCornerNone);
 }
 
 static void update_battery_levels(BatteryChargeState charge_state) {
