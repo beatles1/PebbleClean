@@ -80,7 +80,7 @@ static void update_weather() {
 	}
 
 	int value = 1;
-	dict_write_int(iter, 1, &value, sizeof(int), true);
+	dict_write_int(iter, MESSAGE_KEY_WeatherRequest, &value, sizeof(int), true);
 	dict_write_end(iter);
 
 	app_message_outbox_send();
@@ -178,7 +178,7 @@ static void load_settings() {
 
 static void app_message_handler(DictionaryIterator *iter, void *context) {
 	// Weather
-	Tuple *temp_tuple = dict_find(iter, 2);
+	Tuple *temp_tuple = dict_find(iter, MESSAGE_KEY_WeatherResponse);
 	
 	if (temp_tuple != NULL && temp_tuple->length <= sizeof(weather_text)) {
 		memcpy(weather_text, temp_tuple->value, temp_tuple->length);

@@ -17,7 +17,9 @@
             "HealthMetric",
             "HealthTarget",
             "HealthBarColour",
-            "BatteryBarColour"
+            "BatteryBarColour",
+            "WeatherRequest",
+            "WeatherResponse"
         ],
         "projectType": "native",
         "resources": {

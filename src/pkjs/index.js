@@ -41,7 +41,7 @@ function retrieve_weather() {
 							localStorage.setItem("storedTemp", response.main.temp);
 							localStorage.setItem("tempTime", new Date().getTime());
 							
-							Pebble.sendAppMessage( {'2': String(Math.round(response.main.temp)) +"°C"},
+							Pebble.sendAppMessage( {'WeatherResponse': String(Math.round(response.main.temp)) +"°C"},
 								function(e) {
 									console.log('Successfully delivered message with transactionId='+ e.data.transactionId);
 								},
@@ -85,7 +85,7 @@ function js_update_weather() {
 }
 
 Pebble.addEventListener("appmessage", function(e) {
-	if (e.payload["1"] == 1) {
+	if (e.payload["WeatherRequest"] == 1) {
 		js_update_weather();
 	}
 });
