@@ -63,7 +63,7 @@ module.exports = [
       },
       {
         "type": "input",
-        "messageKey": "Target",
+        "messageKey": "HealthTarget",
         "defaultValue": "10000",
         "label": "Target",
         "attributes": {

@@ -29,24 +29,29 @@ static int last_weather_update = 0;
 static HealthMetric health_metric;
 static bool health_data_available;
 static HealthValue health_value;
+static int health_target;
 static float health_bar_width;
 
 static void init_health() {
 	switch (settings.health_metric) {
 		case 2:
 			health_metric = HealthMetricActiveSeconds;
+			health_target = settings.health_target * 60;
 			break;
 		case 3:
 			health_metric = HealthMetricWalkedDistanceMeters;
+			health_target = settings.health_target;
 			break;
 		case 4:
 			health_metric = HealthMetricSleepSeconds;
+			health_target = settings.health_target * 60;
 			break;
 		case 5:
 			health_metric = HealthMetricActiveKCalories;
 			break;
 		default:
 			health_metric = HealthMetricStepCount;
+			health_target = settings.health_target;
 			break;
 	}
 
@@ -61,12 +66,11 @@ static void init_health() {
 static void update_health() {
 	if (health_data_available) {
 		health_value = health_service_sum_today(health_metric);
-		health_bar_width = ((float)health_value / (float)settings.health_target);
+		health_bar_width = ((float)health_value / (float)health_target);
 	} else {
 		health_bar_width = 1;
 	}
-	APP_LOG(APP_LOG_LEVEL_INFO, "Health Value: %d", (int)health_value);
-	APP_LOG(APP_LOG_LEVEL_INFO, "Health Target: %d", (int)settings.health_target);
+	//APP_LOG(APP_LOG_LEVEL_INFO, "Health Value: %d", (int)health_value);
 }
 
 static void update_weather() {
@@ -189,14 +193,11 @@ static void app_message_handler(DictionaryIterator *iter, void *context) {
 	// Settings
 	Tuple *health_metric_t = dict_find(iter, MESSAGE_KEY_HealthMetric);
 	if(health_metric_t) {
-		settings.health_metric = health_metric_t->value->int32;
-		init_health();
-		update_health();
+		settings.health_metric = atoi(health_metric_t->value->cstring);
 	}
 	Tuple *health_target_t = dict_find(iter, MESSAGE_KEY_HealthTarget);
 	if(health_target_t) {
-		settings.health_target = health_target_t->value->int32;
-		update_health();
+		settings.health_target = atoi(health_target_t->value->cstring);
 	}
 	Tuple *health_colour_t = dict_find(iter, MESSAGE_KEY_HealthBarColour);
 	if(health_colour_t) {
@@ -208,6 +209,9 @@ static void app_message_handler(DictionaryIterator *iter, void *context) {
 	}
 
 	if (health_metric_t || health_target_t || health_colour_t || battery_colour_t) {
+		init_health();
+		update_health();
+		layer_mark_dirty(s_drawing_layer);
 		save_settings();
 	}
 }
