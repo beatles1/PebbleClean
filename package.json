@@ -1,12 +1,15 @@
 {
     "author": "Edward Bowden",
-    "dependencies": {},
+    "dependencies": {
+        "@rebble/clay": "^1.0.6"
+    },
     "keywords": [],
     "name": "clean",
     "pebble": {
         "capabilities": [
             "location",
-            "health"
+            "health",
+            "configurable"
         ],
         "displayName": "Clean",
         "enableMultiJS": false,
