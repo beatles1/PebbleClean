@@ -1,5 +1,14 @@
 #include <pebble.h>
 
+#define SETTINGS_KEY 1
+typedef struct ClaySettings {
+	int health_metric;
+	int health_target;
+	GColor health_colour;
+	GColor battery_colour;
+} ClaySettings;
+static ClaySettings settings;
+
 static Window *s_main_window;
 static TextLayer *s_time_layer;
 static TextLayer *s_date_layer;
@@ -21,12 +30,27 @@ static HealthMetric health_metric;
 static bool health_data_available;
 static HealthValue health_value;
 static float health_bar_width;
-static int health_target;
 
 static void init_health() {
-	health_target = 10000; // todo: allow this to be set in settings
+	switch (settings.health_metric) {
+		case 2:
+			health_metric = HealthMetricActiveSeconds;
+			break;
+		case 3:
+			health_metric = HealthMetricWalkedDistanceMeters;
+			break;
+		case 4:
+			health_metric = HealthMetricSleepSeconds;
+			break;
+		case 5:
+			health_metric = HealthMetricActiveKCalories;
+			break;
+		default:
+			health_metric = HealthMetricStepCount;
+			break;
+	}
 
-	health_metric = HealthMetricStepCount; // todo: allow this to be set in settings
+	
 	time_t start = time_start_of_today();
 	time_t end = time(NULL);
 
@@ -37,7 +61,7 @@ static void init_health() {
 static void update_health() {
 	if (health_data_available) {
 		health_value = health_service_sum_today(health_metric);
-		health_bar_width = ((float)health_value / (float)health_target);
+		health_bar_width = ((float)health_value / (float)settings.health_target);
 	} else {
 		health_bar_width = 1;
 	}
@@ -108,8 +132,8 @@ static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
 
 	// Draw health bar
 	if (bluetooth_status) {
-		graphics_context_set_stroke_color(ctx, GColorVividViolet);
-		graphics_context_set_fill_color(ctx, GColorVividViolet);
+		graphics_context_set_stroke_color(ctx, settings.health_colour);
+		graphics_context_set_fill_color(ctx, settings.health_colour);
 	} else {
 		graphics_context_set_stroke_color(ctx, GColorDarkCandyAppleRed);
 		graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
@@ -121,7 +145,7 @@ static void update_battery_levels(BatteryChargeState charge_state) {
 	if (charge_state.is_plugged) {
 		battery_bar_color = GColorBlueMoon;
 	} else if (charge_state.charge_percent >= 20) {
-		battery_bar_color = GColorCadetBlue;
+		battery_bar_color = settings.battery_colour;
 	} else {
 		battery_bar_color = GColorDarkCandyAppleRed;
 	}
@@ -139,12 +163,49 @@ static void bluetooth_handler(bool bt_status) {
 	layer_mark_dirty(s_drawing_layer);
 }
 
+static void save_settings() {
+	persist_write_data(SETTINGS_KEY, &settings, sizeof(settings));
+}
+
+static void load_settings() {
+	settings.health_metric = 1;
+	settings.health_target = 10000;
+	settings.health_colour = GColorVividViolet;
+	settings.battery_colour = GColorCadetBlue;
+
+	persist_read_data(SETTINGS_KEY, &settings, sizeof(settings));
+}
+
 static void app_message_handler(DictionaryIterator *iter, void *context) {
+	// Weather
 	Tuple *temp_tuple = dict_find(iter, 2);
 	
 	if (temp_tuple != NULL && temp_tuple->length <= sizeof(weather_text)) {
 		memcpy(weather_text, temp_tuple->value, temp_tuple->length);
 		text_layer_set_text(s_weather_layer, weather_text);
+	}
+
+	// Settings
+	Tuple *health_metric_t = dict_find(iter, MESSAGE_KEY_HealthMetric);
+	if(health_metric_t) {
+		settings.health_metric = health_metric_t->value->int32;
+		init_health();
+	}
+	Tuple *health_target_t = dict_find(iter, MESSAGE_KEY_HealthTarget);
+	if(health_target_t) {
+		settings.health_target = health_target_t->value->int32;
+	}
+	Tuple *health_colour_t = dict_find(iter, MESSAGE_KEY_HealthBarColour);
+	if(health_colour_t) {
+		settings.health_colour = GColorFromHEX(health_colour_t->value->int32);
+	}
+	Tuple *battery_colour_t = dict_find(iter, MESSAGE_KEY_BatteryBarColour);
+	if(battery_colour_t) {
+		settings.battery_colour = GColorFromHEX(battery_colour_t->value->int32);
+	}
+
+	if (health_metric_t || health_target_t || health_colour_t || battery_colour_t) {
+		save_settings();
 	}
 }
 
@@ -222,6 +283,9 @@ static void main_window_unload(Window *window) {
 }
 
 static void init() {
+	// Load settings
+	load_settings();
+
 	// Create main Window element and assign to pointer
 	s_main_window = window_create();
 
@@ -249,7 +313,7 @@ static void init() {
 
 static void deinit() {
 	// Destroy Window
-  window_destroy(s_main_window);
+  	window_destroy(s_main_window);
 	tick_timer_service_unsubscribe();
 	battery_state_service_unsubscribe();
 	bluetooth_connection_service_unsubscribe();

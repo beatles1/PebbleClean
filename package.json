@@ -13,35 +13,15 @@
         ],
         "displayName": "Clean",
         "enableMultiJS": false,
-        "messageKeys": [],
+        "messageKeys": [
+            "HealthMetric",
+            "HealthTarget",
+            "HealthBarColour",
+            "BatteryBarColour"
+        ],
         "projectType": "native",
         "resources": {
             "media": [
-                {
-                    "file": "images/diamond_purple2.png",
-                    "name": "DIAMOND_BACKGROUND_PURPLE2",
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/diamond_blue.png",
-                    "name": "DIAMOND_BACKGROUND_BLUE",
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/diamond_purple.png",
-                    "name": "DIAMOND_BACKGROUND_PURPLE",
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/diamond_green.png",
-                    "name": "DIAMOND_BACKGROUND_GREEN",
-                    "type": "bitmap"
-                },
-                {
-                    "file": "images/poly.png",
-                    "name": "POLY_BACKGROUND",
-                    "type": "bitmap"
-                },
                 {
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_40",

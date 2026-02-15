@@ -1,11 +1,17 @@
-var cacheTime = 840000; // Time to cache temp in ms (14 mins)
-var owmapikey = "23789eef1c47852e89dc06b532451573";
-
 Pebble.addEventListener('ready',
 	function(e) {
 		return;
 	}
 );
+
+// Config
+var Clay = require('@rebble/clay');
+var clayConfig = require('./config');
+var clay = new Clay(clayConfig);
+
+// Weather
+var cacheTime = 840000; // Time to cache temp in ms (14 mins)
+var owmapikey = "23789eef1c47852e89dc06b532451573";
 
 function retrieve_weather() {
 	console.log("Updating Weather...");
