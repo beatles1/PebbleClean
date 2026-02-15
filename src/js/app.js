@@ -69,7 +69,7 @@ function js_update_weather() {
 	console.log("js_update_weather");
 	// Send our stored value if we have one
 	if (localStorage.getItem("storedTemp") !== null) {
-		Pebble.sendAppMessage( {'2': String(Math.round(localStorage.getItem("storedTemp"))) +"°C"},
+		Pebble.sendAppMessage( {'WeatherResponse': String(Math.round(localStorage.getItem("storedTemp"))) +"°C"},
 			function(e) {
 				console.log('Successfully delivered message with transactionId='+ e.data.transactionId);
 			},
