@@ -12,7 +12,7 @@
             "configurable"
         ],
         "displayName": "Clean",
-        "enableMultiJS": false,
+        "enableMultiJS": true,
         "messageKeys": [
             "HealthMetric",
             "HealthTarget",

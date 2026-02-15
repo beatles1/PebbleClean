@@ -65,7 +65,8 @@ static void update_health() {
 	} else {
 		health_bar_width = 1;
 	}
-	//APP_LOG(APP_LOG_LEVEL_INFO, "Health Value: %d", (int)health_value);
+	APP_LOG(APP_LOG_LEVEL_INFO, "Health Value: %d", (int)health_value);
+	APP_LOG(APP_LOG_LEVEL_INFO, "Health Target: %d", (int)settings.health_target);
 }
 
 static void update_weather() {
@@ -190,10 +191,12 @@ static void app_message_handler(DictionaryIterator *iter, void *context) {
 	if(health_metric_t) {
 		settings.health_metric = health_metric_t->value->int32;
 		init_health();
+		update_health();
 	}
 	Tuple *health_target_t = dict_find(iter, MESSAGE_KEY_HealthTarget);
 	if(health_target_t) {
 		settings.health_target = health_target_t->value->int32;
+		update_health();
 	}
 	Tuple *health_colour_t = dict_find(iter, MESSAGE_KEY_HealthBarColour);
 	if(health_colour_t) {
