@@ -25,6 +25,13 @@
         "resources": {
             "media": [
                 {
+                    "characterRegex": "[:0-9]",
+                    "file": "fonts/Squares Bold Free.ttf",
+                    "name": "FONT_SQUARES_BOLD_60",
+                    "type": "font"
+                },
+                {
+                    "characterRegex": "[:0-9]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_40",
                     "type": "font"

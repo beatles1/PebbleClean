@@ -68,7 +68,7 @@ static void update_health() {
 		health_value = health_service_sum_today(health_metric);
 		health_bar_width = ((float)health_value / (float)health_target);
 	} else {
-		health_bar_width = 1;
+		health_bar_width = 0.5;
 	}
 	//APP_LOG(APP_LOG_LEVEL_INFO, "Health Value: %d", (int)health_value);
 }
@@ -134,7 +134,7 @@ static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
 	graphics_context_set_stroke_color(ctx, battery_bar_color);
 	graphics_context_set_fill_color(ctx, battery_bar_color);
 	graphics_fill_rect(ctx, GRect((window_size.w / 2) - ((window_size.w * battery_bar_width) / 2), (window_size.h - 4), (window_size.w * battery_bar_width), 4), 0, GCornerNone);
-
+	
 	// Draw health bar
 	if (bluetooth_status) {
 		graphics_context_set_stroke_color(ctx, settings.health_colour);
@@ -143,7 +143,7 @@ static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
 		graphics_context_set_stroke_color(ctx, GColorDarkCandyAppleRed);
 		graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
 	}
-	graphics_fill_rect(ctx, GRect(((window_size.w / 2) - ((window_size.w * health_bar_width) / 2)), 91, (window_size.w * health_bar_width), 4), 0, GCornerNone);
+	graphics_fill_rect(ctx, GRect(((window_size.w / 2) - ((window_size.w * health_bar_width) / 2)), (window_size.h * 0.54), (window_size.w * health_bar_width), 4), 0, GCornerNone);
 }
 
 static void update_battery_levels(BatteryChargeState charge_state) {
@@ -227,12 +227,16 @@ static void main_window_load(Window *window) {
 	bitmap_layer_set_bitmap(s_background_layer, s_background_bitmap);
 	layer_add_child(root_layer, bitmap_layer_get_layer(s_background_layer));*/
 	
+	if (window_size.h > 200) {
+		s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_60));
+	} else {
+		s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_40));
+	}
 	
-	s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_40));
 	s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_16));
 	
 	// Create time TextLayer
-	s_time_layer = text_layer_create(GRect(0, 45, window_size.w, 50));
+	s_time_layer = text_layer_create(GRect(0, (window_size.h * 0.26), window_size.w, 50));
 	text_layer_set_background_color(s_time_layer, GColorClear);
 	text_layer_set_text_color(s_time_layer, GColorWhite);
 	text_layer_set_font(s_time_layer, s_time_font);
@@ -241,7 +245,7 @@ static void main_window_load(Window *window) {
 	layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
 	
 	// Create date TextLayer
-	s_date_layer = text_layer_create(GRect(0, 95, window_size.w, 50));
+	s_date_layer = text_layer_create(GRect(0, (window_size.h * 0.57), window_size.w, 50));
 	text_layer_set_background_color(s_date_layer, GColorClear);
 	text_layer_set_text_color(s_date_layer, GColorWhite);
 	text_layer_set_font(s_date_layer, s_date_font);
