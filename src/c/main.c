@@ -65,7 +65,7 @@ static void init_health() {
 }
 
 static void update_health() {
-	if (!health_data_available) {
+	if (health_data_available) {
 		health_value = health_service_sum_today(health_metric);
 		health_bar_width = ((float)health_value / (float)health_target);
 	} else {
