@@ -38,6 +38,11 @@
                 },
                 {
                     "file": "fonts/Squares Bold Free.ttf",
+                    "name": "FONT_SQUARES_BOLD_20",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_16",
                     "type": "font"
                 }

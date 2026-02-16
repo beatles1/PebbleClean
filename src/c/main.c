@@ -144,7 +144,7 @@ static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
 		graphics_context_set_stroke_color(ctx, GColorDarkCandyAppleRed);
 		graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
 	}
-	graphics_fill_rect(ctx, GRect(((window_size.w / 2) - ((window_size.w * health_bar_width) / 2)), time_text_bottom + 6, (window_size.w * health_bar_width), 4), 0, GCornerNone);
+	graphics_fill_rect(ctx, GRect(((window_size.w / 2) - ((window_size.w * health_bar_width) / 2)), time_text_bottom + 7, (window_size.w * health_bar_width), 4), 0, GCornerNone);
 }
 
 static void update_battery_levels(BatteryChargeState charge_state) {
@@ -232,12 +232,12 @@ static void main_window_load(Window *window) {
 	if (window_size.h > 200) {
 		s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_60));
 		time_text_bottom = time_text_top + 60;
+		s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_20));
 	} else {
 		s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_40));
 		time_text_bottom = time_text_top + 40;
+		s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_16));
 	}
-	
-	s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_16));
 	
 	// Create time TextLayer
 	s_time_layer = text_layer_create(GRect(0, (window_size.h * 0.26), window_size.w, 60));
@@ -249,7 +249,7 @@ static void main_window_load(Window *window) {
 	layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
 	
 	// Create date TextLayer
-	s_date_layer = text_layer_create(GRect(0, time_text_bottom + 10, window_size.w, 50));
+	s_date_layer = text_layer_create(GRect(0, time_text_bottom + 11, window_size.w, 50));
 	text_layer_set_background_color(s_date_layer, GColorClear);
 	text_layer_set_text_color(s_date_layer, GColorWhite);
 	text_layer_set_font(s_date_layer, s_date_font);
