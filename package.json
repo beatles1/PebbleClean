@@ -37,11 +37,13 @@
                     "type": "font"
                 },
                 {
+                    "characterRegex": "[A-Z 0-9°]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_20",
                     "type": "font"
                 },
                 {
+                    "characterRegex": "[A-Z 0-9°]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_16",
                     "type": "font"
