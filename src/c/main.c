@@ -24,13 +24,14 @@ static GSize window_size;
 static GColor battery_bar_color;
 static float battery_bar_width;
 static bool bluetooth_status;
-static char weather_text[64] = "...";
+static char weather_text[32] = "...";
 static int last_weather_update = 0;
 static HealthMetric health_metric;
 static bool health_data_available;
 static HealthValue health_value;
 static int health_target;
 static float health_bar_width;
+static int time_text_bottom = 0;
 
 static void init_health() {
 	switch (settings.health_metric) {
@@ -64,7 +65,7 @@ static void init_health() {
 }
 
 static void update_health() {
-	if (health_data_available) {
+	if (!health_data_available) {
 		health_value = health_service_sum_today(health_metric);
 		health_bar_width = ((float)health_value / (float)health_target);
 	} else {
@@ -143,7 +144,7 @@ static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
 		graphics_context_set_stroke_color(ctx, GColorDarkCandyAppleRed);
 		graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
 	}
-	graphics_fill_rect(ctx, GRect(((window_size.w / 2) - ((window_size.w * health_bar_width) / 2)), (window_size.h * 0.54), (window_size.w * health_bar_width), 4), 0, GCornerNone);
+	graphics_fill_rect(ctx, GRect(((window_size.w / 2) - ((window_size.w * health_bar_width) / 2)), time_text_bottom + 6, (window_size.w * health_bar_width), 4), 0, GCornerNone);
 }
 
 static void update_battery_levels(BatteryChargeState charge_state) {
@@ -227,16 +228,19 @@ static void main_window_load(Window *window) {
 	bitmap_layer_set_bitmap(s_background_layer, s_background_bitmap);
 	layer_add_child(root_layer, bitmap_layer_get_layer(s_background_layer));*/
 	
+	int time_text_top = (window_size.h * 0.26);
 	if (window_size.h > 200) {
 		s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_60));
+		time_text_bottom = time_text_top + 60;
 	} else {
 		s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_40));
+		time_text_bottom = time_text_top + 40;
 	}
 	
 	s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_16));
 	
 	// Create time TextLayer
-	s_time_layer = text_layer_create(GRect(0, (window_size.h * 0.26), window_size.w, 50));
+	s_time_layer = text_layer_create(GRect(0, (window_size.h * 0.26), window_size.w, 60));
 	text_layer_set_background_color(s_time_layer, GColorClear);
 	text_layer_set_text_color(s_time_layer, GColorWhite);
 	text_layer_set_font(s_time_layer, s_time_font);
@@ -245,7 +249,7 @@ static void main_window_load(Window *window) {
 	layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
 	
 	// Create date TextLayer
-	s_date_layer = text_layer_create(GRect(0, (window_size.h * 0.57), window_size.w, 50));
+	s_date_layer = text_layer_create(GRect(0, time_text_bottom + 10, window_size.w, 50));
 	text_layer_set_background_color(s_date_layer, GColorClear);
 	text_layer_set_text_color(s_date_layer, GColorWhite);
 	text_layer_set_font(s_date_layer, s_date_font);
