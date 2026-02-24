@@ -12,7 +12,7 @@ var clay = new Clay(clayConfig);
 
 // Weather
 var cacheTime = 840000; // Time to cache temp in ms (14 mins)
-var owmapikey = "23789eef1c47852e89dc06b532451573";
+//var owmapikey = "23789eef1c47852e89dc06b532451573";
 
 function retrieve_weather() {
 	console.log("Updating Weather...");
@@ -28,9 +28,9 @@ function retrieve_weather() {
 			console.log('lat= ' + pos.coords.latitude + ' lon= ' + pos.coords.longitude + ' time: ' + new Date().getMinutes());
 
 			var xmlhttp = new XMLHttpRequest();
-			//var url = "https://beatles1-open-weather-map-v1.p.mashape.com/?lat="+ pos.coords.latitude +"&lon="+ pos.coords.longitude +"&units=metric&APPID="+ owmapikey;
-			url = "http://api.openweathermap.org/data/2.5/weather?lat="+ pos.coords.latitude +"&lon="+ pos.coords.longitude +"&units=metric&APPID="+ owmapikey;
-			
+			//url = "http://api.openweathermap.org/data/2.5/weather?lat="+ pos.coords.latitude +"&lon="+ pos.coords.longitude +"&units=metric&APPID="+ owmapikey;
+			url = "https://api.open-meteo.com/v1/forecast?latitude="+ pos.coords.latitude +"&longitude="+ pos.coords.longitude +"&current=temperature_2m";
+
 			xmlhttp.onreadystatechange = function() {
 					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 						var response = JSON.parse(xmlhttp.responseText);
@@ -38,11 +38,13 @@ function retrieve_weather() {
 							console.log(url);
 							console.log(JSON.stringify(response));
 							console.log(response.main.temp);
+
+							const temp = response.current.temperature_2m;
 							
-							localStorage.setItem("storedTemp", response.main.temp);
+							localStorage.setItem("storedTemp", temp);
 							localStorage.setItem("tempTime", new Date().getTime());
 							
-							Pebble.sendAppMessage( {'WeatherResponse': String(Math.round(response.main.temp)) +"°C"},
+							Pebble.sendAppMessage( {'WeatherResponse': String(Math.round(temp)) +"°C"},
 								function(e) {
 									console.log('Successfully delivered message with transactionId='+ e.data.transactionId);
 								},
@@ -55,8 +57,7 @@ function retrieve_weather() {
 					}
 			};
 			xmlhttp.open("GET", url, true);
-			xmlhttp.setRequestHeader('X-Mashape-Key', 'y8xvtmL8AMmshgxF1lQPlC5FJjrqp1W01WCjsnGrc01VPZt9er');
-			xmlhttp.setRequestHeader('Accept', 'text/plain');
+			//xmlhttp.setRequestHeader('Accept', 'text/plain');
 			xmlhttp.send();
 		}
 	}, function(err) {
