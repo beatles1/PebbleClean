@@ -34,10 +34,9 @@ function retrieve_weather() {
 			xmlhttp.onreadystatechange = function() {
 					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 						var response = JSON.parse(xmlhttp.responseText);
-						if (response && response.main && response.main.temp) {
+						if (response && response.current && response.current.temperature_2m) {
 							console.log(url);
 							console.log(JSON.stringify(response));
-							console.log(response.main.temp);
 
 							const temp = response.current.temperature_2m;
 							
