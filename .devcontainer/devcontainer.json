@@ -26,8 +26,7 @@
     },
     "codespaces": {
       "openFiles": [
-        "src/c/main.c",
-        "src/pkjs/weather.js"
+        "src/c/main.c"
       ]
     }
   },
