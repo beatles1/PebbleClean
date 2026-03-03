@@ -1,7 +1,7 @@
 ## Clean
 ### Pebble Watchface
 
-![Screenshot](https://appstore-api.repebble.com/api/assets/screenshots/30059ade40e44f408302f543/basalt/c2e53947-0140-4d3f-8547-363cbba08eac.png)
+![Screenshot](https://appstore-api.repebble.com/api/assets/screenshots/30059ade40e44f408302f543/basalt/349c7792-1d79-42bc-8a9b-552c346980c6.png)
 
 Simple digital watchface with:
 - Temperature from Open Meteo
