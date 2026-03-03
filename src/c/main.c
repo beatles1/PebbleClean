@@ -6,11 +6,14 @@ typedef struct ClaySettings {
 	int health_target;
 	GColor health_colour;
 	GColor battery_colour;
+  int vertical_layout;
 } ClaySettings;
 static ClaySettings settings;
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
+static TextLayer *s_hours_layer;
+static TextLayer *s_minutes_layer;
 static TextLayer *s_date_layer;
 static TextLayer *s_weather_layer;
 static GFont s_time_font;
@@ -32,6 +35,7 @@ static HealthValue health_value;
 static int health_target;
 static float health_bar_width;
 static int time_text_bottom = 0;
+static int healthBarY;
 
 static void init_health() {
 	switch (settings.health_metric) {
@@ -96,26 +100,45 @@ static void update_time() {
 	// Get a tm structure
 	time_t temp = time(NULL); 
 	struct tm *tick_time = localtime(&temp);
-
-	// Create a long-lived buffer
-	static char tbuffer[] = "00:00";
-	static char dbuffer[] = "Mon Jan 01";
-
-	// Write the current hours and minutes into the buffer
-	if(clock_is_24h_style() == true) {
-		// Use 24 hour format
-		strftime(tbuffer, sizeof("00:00"), "%H:%M", tick_time);
-	} else {
-		// Use 12 hour format
-		strftime(tbuffer, sizeof("00:00"), "%I:%M", tick_time);
-	}
-	
-	// Write the current date into the buffer
-	strftime(dbuffer, sizeof("Mon Jan 01"), "%a %b %d", tick_time);
-
-	// Display this time & date on the TextLayer
-	text_layer_set_text(s_time_layer, tbuffer);
-	text_layer_set_text(s_date_layer, dbuffer);
+  
+  if (settings.vertical_layout) {  // Vertical Layout
+    
+    static char hbuffer[] = "00";
+    static char mbuffer[] = "00";
+    
+    if(clock_is_24h_style() == true) {
+  		strftime(hbuffer, sizeof("00"), "%H", tick_time);
+  	} else {
+  		strftime(hbuffer, sizeof("00"), "%I", tick_time);
+  	}
+    strftime(mbuffer, sizeof("00"), "%M", tick_time);
+    
+    text_layer_set_text(s_hours_layer, hbuffer);
+    text_layer_set_text(s_minutes_layer, mbuffer);
+    
+  } else {  // Horizontal Layout
+    
+  	// Create a long-lived buffer
+  	static char tbuffer[] = "00:00";
+  
+  	// Write the current hours and minutes into the buffer
+  	if(clock_is_24h_style() == true) {
+  		// Use 24 hour format
+  		strftime(tbuffer, sizeof("00:00"), "%H:%M", tick_time);
+  	} else {
+  		// Use 12 hour format
+  		strftime(tbuffer, sizeof("00:00"), "%I:%M", tick_time);
+  	}
+  
+  	// Display this time & date on the TextLayer
+  	text_layer_set_text(s_time_layer, tbuffer);
+    
+  }
+  
+  // Date
+  static char dbuffer[] = "Mon Jan 01";
+  strftime(dbuffer, sizeof("Mon Jan 01"), "%a %b %d", tick_time);
+  text_layer_set_text(s_date_layer, dbuffer);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -144,7 +167,8 @@ static void drawing_layer_update(Layer *this_layer, GContext *ctx) {
 		graphics_context_set_stroke_color(ctx, GColorDarkCandyAppleRed);
 		graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
 	}
-	graphics_fill_rect(ctx, GRect(((window_size.w / 2) - ((window_size.w * health_bar_width) / 2)), time_text_bottom + 7, (window_size.w * health_bar_width), 4), 0, GCornerNone);
+  
+	graphics_fill_rect(ctx, GRect(((window_size.w / 2) - ((window_size.w * health_bar_width) / 2)), healthBarY, (window_size.w * health_bar_width), 4), 0, GCornerNone);
 }
 
 static void update_battery_levels(BatteryChargeState charge_state) {
@@ -178,6 +202,7 @@ static void load_settings() {
 	settings.health_target = 10000;
 	settings.health_colour = GColorVividViolet;
 	settings.battery_colour = GColorCadetBlue;
+  settings.vertical_layout = 0;
 
 	persist_read_data(SETTINGS_KEY, &settings, sizeof(settings));
 }
@@ -208,11 +233,34 @@ static void app_message_handler(DictionaryIterator *iter, void *context) {
 	if(battery_colour_t) {
 		settings.battery_colour = GColorFromHEX(battery_colour_t->value->int32);
 	}
-
-	if (health_metric_t || health_target_t || health_colour_t || battery_colour_t) {
+  Tuple *vertical_layout_t = dict_find(iter, MESSAGE_KEY_VerticalLayout);
+	if(vertical_layout_t) {
+		settings.vertical_layout = vertical_layout_t->value->int32;
+	}
+  
+  // If a setting changed
+	if (health_metric_t || health_target_t || health_colour_t || battery_colour_t || vertical_layout_t) {
 		init_health();
 		update_health();
+    update_battery_levels(battery_state_service_peek());
 		layer_mark_dirty(s_drawing_layer);
+    
+    if (settings.vertical_layout) {
+      text_layer_set_text(s_time_layer, "");
+      layer_set_frame(text_layer_get_layer(s_date_layer), GRect(0, window_size.h - 35, window_size.w, 50));
+      if (window_size.h > 200) {
+        healthBarY = time_text_bottom - 7;
+      } else {
+        healthBarY = time_text_bottom - 5;
+      }
+    } else {
+      text_layer_set_text(s_hours_layer, "");
+      text_layer_set_text(s_minutes_layer, "");
+      layer_set_frame(text_layer_get_layer(s_date_layer), GRect(0, time_text_bottom + 11, window_size.w, 50));
+      healthBarY = time_text_bottom + 7;
+    }
+    
+    update_time();
 		save_settings();
 	}
 }
@@ -238,6 +286,15 @@ static void main_window_load(Window *window) {
 		time_text_bottom = time_text_top + 40;
 		s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_16));
 	}
+  
+  healthBarY = time_text_bottom + 7;
+  if (settings.vertical_layout) {
+    if (window_size.h > 200) {
+      healthBarY = time_text_bottom - 7;
+    } else {
+      healthBarY = time_text_bottom - 5;
+    }
+  }
 	
 	// Create time TextLayer
 	s_time_layer = text_layer_create(GRect(0, (window_size.h * 0.26), window_size.w, 60));
@@ -245,16 +302,40 @@ static void main_window_load(Window *window) {
 	text_layer_set_text_color(s_time_layer, GColorWhite);
 	text_layer_set_font(s_time_layer, s_time_font);
 	text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
-	// Add it as a child layer to the Window's root layer
 	layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
+  
+  // Create hours TextLayer (for vertical layout)
+  int hoursY = (window_size.h * 0.5) - 55;
+  if (window_size.h > 200) {hoursY = (window_size.h * 0.5) - 75;}
+  s_hours_layer = text_layer_create(GRect(0, hoursY, window_size.w, 60));
+	text_layer_set_background_color(s_hours_layer, GColorClear);
+	text_layer_set_text_color(s_hours_layer, GColorWhite);
+	text_layer_set_font(s_hours_layer, s_time_font);
+	text_layer_set_text_alignment(s_hours_layer, GTextAlignmentCenter);
+	layer_add_child(root_layer, text_layer_get_layer(s_hours_layer));
+  
+  // Create minutes TextLayer (for vertical layout)
+  s_minutes_layer = text_layer_create(GRect(0, (window_size.h * 0.5) - 5, window_size.w, 60));
+	text_layer_set_background_color(s_minutes_layer, GColorClear);
+	text_layer_set_text_color(s_minutes_layer, GColorWhite);
+	text_layer_set_font(s_minutes_layer, s_time_font);
+	text_layer_set_text_alignment(s_minutes_layer, GTextAlignmentCenter);
+	layer_add_child(root_layer, text_layer_get_layer(s_minutes_layer));
 	
 	// Create date TextLayer
-	s_date_layer = text_layer_create(GRect(0, time_text_bottom + 11, window_size.w, 50));
+  int dateY = time_text_bottom + 11;
+  if (settings.vertical_layout) {
+    if (window_size.h > 200) {
+      dateY = window_size.h - 35;
+    } else {
+      dateY = window_size.h - 30;
+    }
+  }
+	s_date_layer = text_layer_create(GRect(0, dateY, window_size.w, 50));
 	text_layer_set_background_color(s_date_layer, GColorClear);
 	text_layer_set_text_color(s_date_layer, GColorWhite);
 	text_layer_set_font(s_date_layer, s_date_font);
 	text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
-	// Add it as a child layer to the Window's root layer
 	layer_add_child(root_layer, text_layer_get_layer(s_date_layer));
 	
 	// Create weather TextLayer
@@ -263,7 +344,6 @@ static void main_window_load(Window *window) {
 	text_layer_set_text_color(s_weather_layer, GColorWhite);
 	text_layer_set_font(s_weather_layer, s_date_font);
 	text_layer_set_text_alignment(s_weather_layer, GTextAlignmentCenter);
-	// Add it as a child layer to the Window's root layer
 	layer_add_child(root_layer, text_layer_get_layer(s_weather_layer));
 	
 	// Grab battery levels before trying to draw them

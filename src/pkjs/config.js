@@ -1,7 +1,22 @@
 module.exports = [
   {
     "type": "heading",
-    "defaultValue": "WatchfaceConfiguration"
+    "defaultValue": "Clean"
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "Layout"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "VerticalLayout",
+        "defaultValue": false,
+        "label": "Vertical Layout"
+      }
+    ]
   },
   {
     "type": "section",
