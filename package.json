@@ -28,24 +28,28 @@
                     "characterRegex": "[:0-9]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_60",
+                    "targetPlatforms": null,
                     "type": "font"
                 },
                 {
                     "characterRegex": "[:0-9]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_40",
+                    "targetPlatforms": null,
                     "type": "font"
                 },
                 {
-                    "characterRegex": "[A-Za-z 0-9\u00b0]",
+                    "characterRegex": "[A-Za-z 0-9\u00b0.]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_20",
+                    "targetPlatforms": null,
                     "type": "font"
                 },
                 {
-                    "characterRegex": "[A-Za-z 0-9\u00b0]",
+                    "characterRegex": "[A-Za-z 0-9\u00b0.]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_16",
+                    "targetPlatforms": null,
                     "type": "font"
                 }
             ]
