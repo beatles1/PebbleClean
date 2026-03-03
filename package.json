@@ -1,5 +1,5 @@
 {
-    "author": "Edward Bowden",
+    "author": "Ed Bowden",
     "dependencies": {
         "@rebble/clay": "^1.0.8"
     },
@@ -8,8 +8,8 @@
     "pebble": {
         "capabilities": [
             "location",
-            "health",
-            "configurable"
+            "configurable",
+            "health"
         ],
         "displayName": "Clean",
         "enableMultiJS": true,
@@ -37,13 +37,13 @@
                     "type": "font"
                 },
                 {
-                    "characterRegex": "[A-Za-z 0-9°]",
+                    "characterRegex": "[A-Za-z 0-9\u00b0]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_20",
                     "type": "font"
                 },
                 {
-                    "characterRegex": "[A-Za-z 0-9°]",
+                    "characterRegex": "[A-Za-z 0-9\u00b0]",
                     "file": "fonts/Squares Bold Free.ttf",
                     "name": "FONT_SQUARES_BOLD_16",
                     "type": "font"
