@@ -23,6 +23,36 @@ module.exports = [
     "items": [
       {
         "type": "heading",
+        "defaultValue": "Temperature"
+      },
+      {
+        "type": "toggle",
+        "messageKey": "Fahrenheit",
+        "defaultValue": false,
+        "label": "Fahrenheit"
+      },
+      {
+        "type": "text",
+        "defaultValue": "Format will update next time temperature is fetched from the web"
+      },
+      {
+        "type": "input",
+        "messageKey": "WeatherCacheMins",
+        "defaultValue": "15",
+        "label": "Update Frequency (mins)",
+        "attributes": {
+          "type": "number",
+          "min": 1,
+          "max": 1000
+        }
+      },
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
         "defaultValue": "Colours"
       },
       {
@@ -89,7 +119,7 @@ module.exports = [
       },
       {
         "type": "text",
-        "defaultValue": "The health bar will be will width when the value reaches the target set above."
+        "defaultValue": "The health bar will be full width when the value reaches the target set above."
       }
     ]
   },

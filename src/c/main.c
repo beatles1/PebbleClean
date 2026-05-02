@@ -7,6 +7,7 @@ typedef struct ClaySettings {
 	GColor health_colour;
 	GColor battery_colour;
   int vertical_layout;
+  int weather_cache_mins;
 } ClaySettings;
 static ClaySettings settings;
 
@@ -145,10 +146,12 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 	update_time();
 	
 	int now = mktime(tick_time);
-	if (last_weather_update <= (now - 900)) {
+	if (last_weather_update <= (now - (settings.weather_cache_mins * 60))) {
 		update_weather();
 		last_weather_update = mktime(tick_time);
 	}
+  
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "now: %d, last_weather_update: %d, cache mins: %d", now, last_weather_update, settings.weather_cache_mins);
 
 	update_health();
 }
@@ -203,6 +206,7 @@ static void load_settings() {
 	settings.health_colour = GColorVividViolet;
 	settings.battery_colour = GColorCadetBlue;
   settings.vertical_layout = 0;
+  settings.weather_cache_mins = 15;
 
 	persist_read_data(SETTINGS_KEY, &settings, sizeof(settings));
 }
@@ -237,9 +241,13 @@ static void app_message_handler(DictionaryIterator *iter, void *context) {
 	if(vertical_layout_t) {
 		settings.vertical_layout = vertical_layout_t->value->int32;
 	}
+  Tuple *weather_cache_mins_t = dict_find(iter, MESSAGE_KEY_WeatherCacheMins);
+	if(weather_cache_mins_t) {
+		settings.weather_cache_mins = atoi(weather_cache_mins_t->value->cstring);
+	}
   
   // If a setting changed
-	if (health_metric_t || health_target_t || health_colour_t || battery_colour_t || vertical_layout_t) {
+	if (health_metric_t || health_target_t || health_colour_t || battery_colour_t || vertical_layout_t || weather_cache_mins_t) {
 		init_health();
 		update_health();
     update_battery_levels(battery_state_service_peek());
@@ -278,7 +286,7 @@ static void main_window_load(Window *window) {
 	
 	int time_text_top = (window_size.h * 0.26);
 	if (window_size.h > 200) {
-		s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_60));
+		s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_58));
 		time_text_bottom = time_text_top + 60;
 		s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_SQUARES_BOLD_20));
 	} else {

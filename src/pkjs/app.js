@@ -11,7 +11,7 @@ var clayConfig = require('./config');
 var clay = new Clay(clayConfig);
 
 // Weather
-var cacheTime = 840000; // Time to cache temp in ms (14 mins)
+//var cacheTime = 840000; // Time to cache temp in ms (14 mins)
 //var owmapikey = "23789eef1c47852e89dc06b532451573";
 
 function retrieve_weather() {
@@ -26,10 +26,17 @@ function retrieve_weather() {
 		if (pos.coords.latitude && pos.coords.longitude) {
 			// Successfully loaded pos
 			console.log('lat= ' + pos.coords.latitude + ' lon= ' + pos.coords.longitude + ' time: ' + new Date().getMinutes());
+      
+      let tempUnit = "celsius";
+      if (getClaySetting("Fahrenheit")) {
+        tempUnit = "fahrenheit"
+      }
+      
+      console.log("Temp unit: "+ tempUnit);
 
 			var xmlhttp = new XMLHttpRequest();
 			//url = "http://api.openweathermap.org/data/2.5/weather?lat="+ pos.coords.latitude +"&lon="+ pos.coords.longitude +"&units=metric&APPID="+ owmapikey;
-			url = "https://api.open-meteo.com/v1/forecast?latitude="+ pos.coords.latitude +"&longitude="+ pos.coords.longitude +"&current=temperature_2m";
+			url = "https://api.open-meteo.com/v1/forecast?latitude="+ pos.coords.latitude +"&longitude="+ pos.coords.longitude +"&current=temperature_2m&temperature_unit="+ tempUnit;
 
 			xmlhttp.onreadystatechange = function() {
 					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -38,12 +45,12 @@ function retrieve_weather() {
 							console.log(url);
 							console.log(JSON.stringify(response));
 
-							const temp = response.current.temperature_2m;
+							const tempStr = String(Math.round(response.current.temperature_2m)) + response.current_units.temperature_2m;
 							
-							localStorage.setItem("storedTemp", temp);
+							localStorage.setItem("storedTemp", tempStr);
 							localStorage.setItem("tempTime", new Date().getTime());
 							
-							Pebble.sendAppMessage( {'WeatherResponse': String(Math.round(temp)) +"°C"},
+							Pebble.sendAppMessage( {'WeatherResponse': tempStr},
 								function(e) {
 									console.log('Successfully delivered message with transactionId='+ e.data.transactionId);
 								},
@@ -69,7 +76,7 @@ function js_update_weather() {
 	console.log("js_update_weather");
 	// Send our stored value if we have one
 	if (localStorage.getItem("storedTemp") !== null) {
-		Pebble.sendAppMessage( {'WeatherResponse': String(Math.round(localStorage.getItem("storedTemp"))) +"°C"},
+		Pebble.sendAppMessage( {'WeatherResponse': localStorage.getItem("storedTemp")},
 			function(e) {
 				console.log('Successfully delivered message with transactionId='+ e.data.transactionId);
 			},
@@ -79,6 +86,11 @@ function js_update_weather() {
 		);
 	}
 	// Update our stored value if it is old
+  let cacheTime = 840000;
+  const weatherCacheMins = getClaySetting("WeatherCacheMins");
+  if (weatherCacheMins) {
+    cacheTime = (weatherCacheMins * 60000) - 30000;
+  }
 	if (!(localStorage.getItem("tempTime")) || localStorage.getItem("tempTime") <= (new Date().getTime() - cacheTime)) {
 		retrieve_weather(); // Get updated weather
 		console.log("Weather too old");
@@ -91,3 +103,17 @@ Pebble.addEventListener("appmessage", function(e) {
 		js_update_weather();
 	}
 });
+
+function getClaySetting(setting) {
+  const settings_json = localStorage.getItem("clay-settings");
+  if (!settings_json) {
+    return false;
+  }
+  
+  const settings = JSON.parse(settings_json);
+  if (setting in settings) {
+    return settings[setting];
+  } else {
+    return false;
+  }
+}

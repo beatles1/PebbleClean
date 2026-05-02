@@ -20,7 +20,9 @@
             "BatteryBarColour",
             "WeatherRequest",
             "WeatherResponse",
-            "VerticalLayout"
+            "VerticalLayout",
+            "Fahrenheit",
+            "WeatherCacheMins"
         ],
         "projectType": "native",
         "resources": {
@@ -28,7 +30,7 @@
                 {
                     "characterRegex": "[:0-9]",
                     "file": "fonts/Squares Bold Free.ttf",
-                    "name": "FONT_SQUARES_BOLD_60",
+                    "name": "FONT_SQUARES_BOLD_58",
                     "targetPlatforms": null,
                     "type": "font"
                 },
